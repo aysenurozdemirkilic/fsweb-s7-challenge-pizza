@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
 import styled from "styled-components";
 
-const orderContainer = styled.div`
+const OrderContainer = styled.div`
   font-family: 'Roboto', sans-serif;
   width: 100%;
-  background-color: red; /* Teknolojik yemekler arka planı kırmızı */
-  color: white; /* Yazı rengini beyaz yapabilirsiniz */
+  background-color: #CE2829; /* Koyu kırmızı */
+  color: white;
+  text-align: center; /* Metni merkezle */
+  padding: 20px;
 `;
 
 const SiparisFormu = () => {
@@ -66,16 +68,9 @@ const SiparisFormu = () => {
   };
 
   return (
-
-    <div className="order-container">
+    <OrderContainer>
       <h1>Teknolojik Yemekler</h1>
       <p>Anasayfa - Seçenekler - <strong>Sipariş Oluştur</strong></p>
-      <div className="acipizza">
-        <p className="position-absolute">Pozisyon Mutlak Acı Pizza</p>
-        <p className="price">85.50 TL</p>
-        <p className="rating">4.9 <span>(200)</span></p>
-        <p className="description">Frontend Geliştirici olarak hala ...</p>
-        </div>
       <form onSubmit={handleSubmit}>
         <label>
           Boyut Seç:
@@ -137,7 +132,7 @@ const SiparisFormu = () => {
           <strong>Toplam Ücret:</strong> {toplamUcret.toFixed(2)} TL
         </div>
       </div>
-    </div>
+    </OrderContainer>
   );
 };
 
