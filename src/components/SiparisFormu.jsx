@@ -1,13 +1,70 @@
+import axios from 'axios';
 import React, { useState } from 'react';
+import { useHistory } from 'react-router-dom';
 import styled from "styled-components";
 
 const OrderContainer = styled.div`
-  font-family: 'Roboto', sans-serif;
+  margin-top: 0;
   width: 100%;
   background-color: #CE2829; /* Koyu kırmızı */
   color: white;
   text-align: center; /* Metni merkezle */
-  padding: 20px;
+  padding: 0px;
+  max-width: 100%; /* Resmin maksimum genişliği */
+  max-height: 100%; /* Resmin maksimum yüksekliği */
+}
+`;
+
+const Title = styled.h1`
+  font-size: 40px;
+  font-family: 'Satisfy', cursive; /* Satisfy fontu kullanılıyor */
+  margin-bottom: 20px; /* Altta biraz boşluk bırak */
+`;
+
+const Form = styled.form`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+`;
+
+const Label = styled.label`
+  display: flex;
+  align-items: center;
+  gap: 5px;
+`;
+
+const TextArea = styled.textarea`
+  width: 100%;
+  height: 100px;
+`;
+
+const EkMalzemelerContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 10px; /* Malzemeler arasında boşluk */
+`;
+
+const EkMalzemeLabel = styled.label`
+  display: flex;
+  align-items: center;
+  gap: 5px;
+`;
+
+const Button = styled.button`
+  background-color: #FDC913; /* Sarı renk */
+  color: #292929; /* Koyu Gri renk */
+  border: none;
+  padding: 10px 20px;
+  border-radius: 25px; /* Yuvarlak kenarlar */
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  text-align: center;
+
+  &:hover {
+    background-color: #FAF7F2; /* Bej renk */
+  }
 `;
 
 const SiparisFormu = () => {
@@ -35,11 +92,31 @@ const SiparisFormu = () => {
   // Toplam ücret
   const toplamUcret = toplamFiyat + ekMalzemeFiyati;
 
+  const history = useHistory();
+
   // Form submit işlemi
   const handleSubmit = (e) => {
     e.preventDefault();
+
+    if (!boyut || !hamur) {
+      alert("Lütfen boyut ve hamur seçiniz.");
+      return;
+    }
+
     // Sipariş oluşturma işlemleri burada yapılabilir
+    const all = {...boyut, ...hamur, ...ekMalzemeler, ...siparisNotu};
     console.log('Sipariş oluşturuldu:', { boyut, hamur, ekMalzemeler, siparisNotu });
+
+    axios.post('https://reqres.in/api/pizza', all)
+    .then(function (response) {
+    // handle success
+    console.log(response);
+     history.push("/siparisonayi")
+    })
+    .catch(function (error) {
+    // handle error
+    console.log(error);
+  })
   };
 
   // Sipariş Notu değişikliği için fonksiyon
@@ -68,59 +145,45 @@ const SiparisFormu = () => {
   };
 
   return (
-    <OrderContainer>
-      <h1>Teknolojik Yemekler</h1>
+    <OrderContainer >
+      <Title>Teknolojik Yemekler</Title>
       <p>Anasayfa - Seçenekler - <strong>Sipariş Oluştur</strong></p>
-      <form onSubmit={handleSubmit}>
-        <label>
+      <Form onSubmit={handleSubmit}>
+        <Label>
           Boyut Seç:
-          <div className="boyut-secimi">
+          <select value={boyut} onChange={handleBoyutChange}>
             {boyutlar.map((secim, index) => (
-              <label key={index} className={`boyut-option ${boyut === secim ? 'selected' : ''}`}>
-                <input
-                  type="radio"
-                  value={secim}
-                  checked={boyut === secim}
-                  onChange={handleBoyutChange}
-                />
-                <span className="boyut-label">{secim}</span>
-              </label>
+              <option key={index} value={secim}>{secim}</option>
             ))}
-          </div>
-        </label>
-        <br />
-        <label>
+          </select>
+        </Label>
+        <Label>
           Hamur Seçimi:
           <select value={hamur} onChange={handleHamurChange}>
             <option value="ince">İnce</option>
             <option value="orta">Orta</option>
             <option value="kalin">Kalın</option>
           </select>
-        </label>
-        <br />
-        <label>
+        </Label>
+        <Label>
           Ek Malzemeler:
           {malzemeler.map((malzeme, index) => (
-            <label key={index}>
-              <input
+            <Label key={index} style={{ marginRight: "10px", marginBottom: "10px" }}>
+            <input
                 type="checkbox"
-                value={malzeme}
                 checked={ekMalzemeler.includes(malzeme)}
                 onChange={() => handleEkMalzemeChange(malzeme)}
               />
               {malzeme}
-            </label>
+            </Label>
           ))}
-        </label>
-        <br />
-        <br />
-        <label>
+        </Label>
+        <Label>
           Sipariş Notu:
-          <textarea value={siparisNotu} onChange={handleSiparisNotuChange} placeholder="Siparişine eklemek istediğin bir not var mı?" />
-        </label>
-        <br />
-        <button type="submit">Sipariş Ver</button>
-      </form>
+          <TextArea value={siparisNotu} onChange={handleSiparisNotuChange} placeholder="Siparişine eklemek istediğin bir not var mı?" />
+        </Label>
+        <Button onClick={handleSubmit} type="submit" >Sipariş Ver</Button>
+      </Form>
       <div className="order-summary">
         <div>
           <strong>Sipariş Toplamı:</strong> {toplamFiyat.toFixed(2)} TL
